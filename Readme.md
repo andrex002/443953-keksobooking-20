@@ -1,7 +1,7 @@
 # Личный проект «Кексобукинг» [![Build status][travis-image]][travis-url]
 
 * Студент: [Андрей Сергеев](https://up.htmlacademy.ru/javascript/20/user/443953).
-* Наставник: `Неизвестно`.
+* Наставник: [Евгений Самойленко](https://htmlacademy.ru/profile/id999539).
 
 ---
 
