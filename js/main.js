@@ -250,6 +250,7 @@ var guestRoom = {
   3: [1, 2, 3],
   100: [0]
 };
+
 var roomNumberSelect = adForm.querySelector('#room_number');
 var capacitySelect = adForm.querySelector('#capacity');
 var adFormSubmitBtn = adForm.querySelector('.ad-form__submit');
