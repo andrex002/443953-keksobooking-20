@@ -82,7 +82,7 @@ var getRandomElement = function (elements) {
   return elements[getRandomInt(0, elements.length - 1)];
 };
 
-//  Вырезает нужное количество элементов из массива
+//  Вырезает случайное количество элементов из массива
 var cutElements = function (elements) {
   var length = getRandomInt(1, elements.length);
   return elements.slice(0, length);
@@ -91,8 +91,9 @@ var cutElements = function (elements) {
 //  Перемешивает массив
 var shuffleArray = function (elements) {
   var copyElements = elements.slice();
-  for (var i = copyElements.length - 1; i > 0; i--) {
-    var j = Math.floor(Math.random() * (i + 1));
+  var lastIndex = copyElements.length - 1;
+  for (var i = lastIndex; i > 0; i--) {
+    var j = getRandomInt(0, lastIndex);
     var temp = copyElements[i];
     copyElements[i] = copyElements[j];
     copyElements[j] = temp;
@@ -106,7 +107,7 @@ var getRandomArray = function (elements) {
 };
 
 //  Создает массив объектов
-var fillsAdsData = function (count) {
+var fillAdsData = function (count) {
   var ads = [];
   for (var i = 1; i <= count; i++) {
     var locationX = getRandomInt(BEGINNING_MAP_X, END_MAP_X);
@@ -195,7 +196,7 @@ var createPhotosFragment = function (photos, template) {
   return photosFragment;
 };
 
-//  Создает DOM-элемент карточки объявления по шаблону
+//  Создает и вставляет в разметку DOM-элемент карточки объявления по шаблону
 var renderCard = function (ad) {
   var cardTemplate = document.querySelector('#card').content.querySelector('.map__card');
   var cardElement = cardTemplate.cloneNode(true);
@@ -223,7 +224,7 @@ var renderCard = function (ad) {
   cardPhotos.appendChild(createPhotosFragment(ad.offer.photos, cardPhoto));
   cardAvatar.src = ad.author.avatar;
 
-  return cardElement;
+  mapFiltersContainer.insertAdjacentElement('beforebegin', cardElement);
 };
 
 //  Определяет позицию элемента
@@ -259,7 +260,7 @@ var disableElements = function (elements) {
 };
 
 //  Активирует страницу
-var activatesPage = function () {
+var activatePage = function () {
   map.classList.remove('map--faded');
   adForm.classList.remove('ad-form--disabled');
   renderBlockAds(ads);
@@ -271,7 +272,7 @@ var activatesPage = function () {
 };
 
 //  Деактивирует страницу
-var deactivatesPage = function () {
+var deactivatePage = function () {
   map.classList.add('map--faded');
   adForm.classList.add('ad-form--disabled');
   removesAdTags();
@@ -287,14 +288,14 @@ var deactivatesPage = function () {
 //  Функция-обработчик клика левой кнопки мыши на элементе
 var onMapPinMousedown = function (evt) {
   if (evt.button === 0) {
-    activatesPage();
+    activatePage();
   }
 };
 
 //  Функция-обработчик клика клавиши Enter на элементе
 var onMapPinKeydown = function (evt) {
   if (evt.key === 'Enter') {
-    activatesPage();
+    activatePage();
   }
 };
 
@@ -319,9 +320,9 @@ var addsEventChange = function (select) {
   select.addEventListener('change', onSelectChange);
 };
 
-var ads = fillsAdsData(NUMBER_ADS);
-deactivatesPage();
+var ads = fillAdsData(NUMBER_ADS);
+deactivatePage();
 addsEventChange(roomNumberSelect);
 addsEventChange(capacitySelect);
-map.insertBefore(renderCard(ads[0]), mapFiltersContainer);
+renderCard(ads[0]);
 validateRooms();
