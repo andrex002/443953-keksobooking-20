@@ -415,7 +415,7 @@ inputPrice.addEventListener('invalid', function () {
 
 registrationTimeFieldset.addEventListener('change', function (evt) {
   var time = evt.target.value;
-  if (timeinSelect.value === time) {
+  if (evt.target === timeinSelect) {
     timeoutSelect.value = time;
   } else {
     timeinSelect.value = time;
