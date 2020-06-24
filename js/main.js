@@ -31,6 +31,24 @@ var TYPE_HOUSING = {
   house: 'Дом',
   palace: 'Дворец'
 };
+var TYPE_PRICE = {
+  'bungalo': {
+    'minPrice': 0,
+    'errorText': 'Минимальная цена 0 руб'
+  },
+  'flat': {
+    'minPrice': 1000,
+    'errorText': 'Минимальная цена 1000 руб'
+  },
+  'house': {
+    'minPrice': 5000,
+    'errorText': 'Минимальная цена 5000 руб'
+  },
+  'palace': {
+    'minPrice': 10000,
+    'errorText': 'Минимальная цена 10000 руб'
+  }
+};
 var GUEST_ROOM = {
   '1': {
     'guests': ['1'],
@@ -63,9 +81,15 @@ var mapPinMain = mapPinsElement.querySelector('.map__pin--main');
 var adForm = document.querySelector('.ad-form');
 var adFormFieldsets = adForm.querySelectorAll('fieldset');
 var mapFiltersElement = map.querySelector('.map__filters');
+var inputTitle = adForm.querySelector('#title');
 var addressInput = adForm.querySelector('#address');
 var roomNumberSelect = adForm.querySelector('#room_number');
 var capacitySelect = adForm.querySelector('#capacity');
+var selectType = adForm.querySelector('#type');
+var inputPrice = adForm.querySelector('#price');
+var timeinSelect = adForm.querySelector('#timein');
+var timeoutSelect = adForm.querySelector('#timeout');
+var registrationTimeFieldset = adForm.querySelector('.ad-form__element--time');
 
 //  Добавляет 0 перед числом
 var addZero = function (num) {
@@ -148,6 +172,16 @@ var renderAd = function (ad) {
   pinImg.alt = ad.offer.title;
   adElement.style.left = ad.location.x - PIN_WIDTH / 2 + 'px';
   adElement.style.top = ad.location.y - PIN_HEIGHT + 'px';
+  adElement.addEventListener('click', function () {
+    activateTag(adElement);
+    deleteItems('.map__card');
+    renderCard(ad);
+    document.addEventListener('keydown', onPopupEscPress);
+    var popupCloseBtn = document.querySelector('.popup__close');
+    popupCloseBtn.addEventListener('click', function () {
+      closePopup();
+    });
+  });
 
   return adElement;
 };
@@ -162,10 +196,10 @@ var renderBlockAds = function (ads) {
 };
 
 //  Удаляет DOM-элементы по селектору
-var deleteItems = function(selector) {
+var deleteItems = function (selector) {
   var elements = document.querySelectorAll(selector);
-  if(elements) {
-    elements.forEach(function(item) {
+  if (elements) {
+    elements.forEach(function (item) {
       item.remove();
     });
   }
@@ -269,7 +303,6 @@ var activatePage = function () {
   fillAddressInput(true);
   mapPinMain.removeEventListener('mousedown', onMapPinMousedown);
   mapPinMain.removeEventListener('keydown', onMapPinKeydown);
-  addsEventToAdTags();
   addressInput.setAttribute('readonly', 'readonly');
 };
 
@@ -318,45 +351,22 @@ var onSelectChange = function () {
 };
 
 //  Навешивает событие change на select
-var addsEventChange = function (select) {
+var addEventChange = function (select) {
   select.addEventListener('change', onSelectChange);
 };
 
 //  Переключает класс active на метках объявлений
-var switchesClassActive = function (adTag) {
-  var adTags = map.querySelectorAll('.map__pin:not(.map__pin--main)');
-  adTags.forEach(function(item) {
-    item.classList.remove('map__pin--active');
-  });
-  adTag.classList.add('map__pin--active');
-};
-
-//  Показывает карточку объявления
-var displaysAdCard = function(adTag, ad) {
-  adTag.addEventListener('click', function() {
-    switchesClassActive(adTag);
-    deleteItems('.map__card');
-    renderCard(ad);
-    document.addEventListener('keydown', onPopupEscPress);
-    var popupCloseBtn = document.querySelector('.popup__close');
-    popupCloseBtn.addEventListener('click', function () {
-      closePopup();
-    });
-  });
-};
-
-//  Навешивает событие на метки объявлений
-var addsEventToAdTags = function() {
-  var adTags = map.querySelectorAll('.map__pin:not(.map__pin--main)');
-  for(var i = 0; i < adTags.length; i++) {
-    displaysAdCard(adTags[i], ads[i]);
+var activateTag = function (adTag) {
+  var adTagActive = map.querySelector('.map__pin--active');
+  if (adTagActive) {
+    adTagActive.classList.remove('map__pin--active');
   }
+  adTag.classList.add('map__pin--active');
 };
 
 //  Обработчик закрытия попапа (карточки объявления) клавишей Escape
 var onPopupEscPress = function (evt) {
-  if(evt.key === 'Escape') {
-    evt.preventDefault();
+  if (evt.key === 'Escape') {
     closePopup();
   }
 };
@@ -367,7 +377,13 @@ var closePopup = function () {
   document.removeEventListener('keydown', onPopupEscPress);
 };
 
-var inputTitle = adForm.querySelector('#title');
+//  Устанавливает значение минимальной цены
+var setMinPrice = function () {
+  var typeHousing = selectType.value;
+  var minPrice = TYPE_PRICE[typeHousing]['minPrice'];
+  inputPrice.min = minPrice;
+  inputPrice.placeholder = minPrice;
+};
 
 inputTitle.addEventListener('invalid', function () {
   if (inputTitle.validity.tooShort) {
@@ -381,64 +397,34 @@ inputTitle.addEventListener('invalid', function () {
   }
 });
 
-var TYPE_PRICE = {
-  'bungalo': {
-    'minPrice': 0,
-    'errorText': 'Минимальная цена 0 руб'
-  },
-  'flat': {
-    'minPrice': 1000,
-    'errorText': 'Минимальная цена 1000 руб'
-  },
-  'house': {
-    'minPrice': 5000,
-    'errorText': 'Минимальная цена 5000 руб'
-  },
-  'palace': {
-    'minPrice': 10000,
-    'errorText': 'Минимальная цена 10000 руб'
-  }
-};
-var selectType = adForm.querySelector('#type');
-var inputPrice = adForm.querySelector('#price');
-
-//  Устанавливает значение минимальной цены
-var setMinPrice = function () {
-  var typeHousing = selectType.value;
-  var minPrice = TYPE_PRICE[typeHousing]['minPrice'];
-  inputPrice.min = minPrice;
-  inputPrice.placeholder = minPrice;
-};
-
 selectType.addEventListener('change', function () {
   setMinPrice();
 });
 
 inputPrice.addEventListener('invalid', function () {
-  if(inputPrice.validity.valueMissing) {
+  if (inputPrice.validity.valueMissing) {
     inputPrice.setCustomValidity('Поле не может быть пустым');
-  } else if(inputPrice.validity.rangeUnderflow) {
+  } else if (inputPrice.validity.rangeUnderflow) {
     inputPrice.setCustomValidity(TYPE_PRICE[selectType.value]['errorText']);
-  } else if(inputPrice.validity.rangeOverflow) {
+  } else if (inputPrice.validity.rangeOverflow) {
     inputPrice.setCustomValidity('Максимальное значение — 1 000 000');
   } else {
     inputPrice.setCustomValidity('');
   }
 });
 
-var timeinSelect = adForm.querySelector('#timein');
-var timeoutSelect = adForm.querySelector('#timeout');
-var registrationTimeFieldset = adForm.querySelector('.ad-form__element--time');
-
-registrationTimeFieldset.addEventListener('change', function(evt) {
+registrationTimeFieldset.addEventListener('change', function (evt) {
   var time = evt.target.value;
-  timeinSelect.value = time;
-  timeoutSelect.value = time;
+  if (timeinSelect.value === time) {
+    timeoutSelect.value = time;
+  } else {
+    timeinSelect.value = time;
+  }
 });
 
 var ads = fillAdsData(NUMBER_ADS);
 deactivatePage();
-addsEventChange(roomNumberSelect);
-addsEventChange(capacitySelect);
+addEventChange(roomNumberSelect);
+addEventChange(capacitySelect);
 validateRooms();
 setMinPrice();
