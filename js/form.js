@@ -1,10 +1,16 @@
 'use strict';
 
 (function () {
-  var inputTitle = window.main.adForm.querySelector('#title');
-  var timeinSelect = window.main.adForm.querySelector('#timein');
-  var timeoutSelect = window.main.adForm.querySelector('#timeout');
-  var registrationTimeFieldset = window.main.adForm.querySelector('.ad-form__element--time');
+  var TYPE_PRICE = window.data.TYPE_PRICE;
+  var inputPrice = window.main.inputPrice;
+  var adForm = window.main.adForm;
+  var selectType = window.main.selectType;
+  var setMinPrice = window.main.setMinPrice;
+
+  var inputTitle = adForm.querySelector('#title');
+  var timeinSelect = adForm.querySelector('#timein');
+  var timeoutSelect = adForm.querySelector('#timeout');
+  var registrationTimeFieldset = adForm.querySelector('.ad-form__element--time');
 
   inputTitle.addEventListener('invalid', function () {
     if (inputTitle.validity.tooShort) {
@@ -18,19 +24,19 @@
     }
   });
 
-  window.main.selectType.addEventListener('change', function () {
-    window.main.setMinPrice();
+  selectType.addEventListener('change', function () {
+    setMinPrice();
   });
 
-  window.main.inputPrice.addEventListener('invalid', function () {
-    if (window.main.inputPrice.validity.valueMissing) {
-      window.main.inputPrice.setCustomValidity('Поле не может быть пустым');
-    } else if (window.main.inputPrice.validity.rangeUnderflow) {
-      window.main.inputPrice.setCustomValidity(window.data.TYPE_PRICE[window.main.selectType.value]['errorText']);
-    } else if (window.main.inputPrice.validity.rangeOverflow) {
-      window.main.inputPrice.setCustomValidity('Максимальное значение — 1 000 000');
+  inputPrice.addEventListener('invalid', function () {
+    if (inputPrice.validity.valueMissing) {
+      inputPrice.setCustomValidity('Поле не может быть пустым');
+    } else if (inputPrice.validity.rangeUnderflow) {
+      inputPrice.setCustomValidity(TYPE_PRICE[selectType.value]['errorText']);
+    } else if (inputPrice.validity.rangeOverflow) {
+      inputPrice.setCustomValidity('Максимальное значение — 1 000 000');
     } else {
-      window.main.inputPrice.setCustomValidity('');
+      inputPrice.setCustomValidity('');
     }
   });
 

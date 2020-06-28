@@ -116,6 +116,62 @@
     return cutElements(shuffleArray(elements));
   };
 
+  //  Создает массив объектов
+  var fillAdsData = function (count) {
+    var ads = [];
+    for (var i = 1; i <= count; i++) {
+      var locationX = getRandomInt(BEGINNING_MAP_X, END_MAP_X);
+      var locationY = getRandomInt(BEGINNING_MAP_Y, END_MAP_Y);
+      ads.push({
+        'author': {
+          'avatar': 'img/avatars/user' + addZero(i) + '.png'
+        },
+        'offer': {
+          'title': TITLES[i - 1],
+          'price': getRandomInt(5000, 20000),
+          'type': getRandomElement(TYPE_HOUSINGS),
+          'address': locationX + ', ' + locationY,
+          'rooms': getRandomInt(1, 3),
+          'guests': getRandomInt(1, 3),
+          'checkin': getRandomElement(REGISTRATION_TIMES),
+          'checkout': getRandomElement(REGISTRATION_TIMES),
+          'features': getRandomArray(FEATURES),
+          'description': getRandomElement(DESCRIPTIONS),
+          'photos': getRandomArray(PHOTOS)
+        },
+        'location': {
+          'x': locationX,
+          'y': locationY
+        }
+      });
+    }
+    return ads;
+  };
+
+  //  Удаляет DOM-элементы по селектору
+  var deleteItems = function (selector) {
+    var elements = document.querySelectorAll(selector);
+    if (elements) {
+      elements.forEach(function (item) {
+        item.remove();
+      });
+    }
+  };
+
+  //  Включает элементы
+  var enableElements = function (elements) {
+    for (var i = 0; i < elements.length; i++) {
+      elements[i].disabled = false;
+    }
+  };
+
+  //  Выключает элементы
+  var disableElements = function (elements) {
+    for (var i = 0; i < elements.length; i++) {
+      elements[i].disabled = true;
+    }
+  };
+
   window.data = {
     TYPE_HOUSING: TYPE_HOUSING,
     TYPE_PRICE: TYPE_PRICE,
@@ -123,53 +179,9 @@
     PIN_WIDTH: PIN_WIDTH,
     PIN_HEIGHT: PIN_HEIGHT,
     NUMBER_ADS: NUMBER_ADS,
-    fillAdsData: function (count) {
-      var ads = [];
-      for (var i = 1; i <= count; i++) {
-        var locationX = getRandomInt(BEGINNING_MAP_X, END_MAP_X);
-        var locationY = getRandomInt(BEGINNING_MAP_Y, END_MAP_Y);
-        ads.push({
-          'author': {
-            'avatar': 'img/avatars/user' + addZero(i) + '.png'
-          },
-          'offer': {
-            'title': TITLES[i - 1],
-            'price': getRandomInt(5000, 20000),
-            'type': getRandomElement(TYPE_HOUSINGS),
-            'address': locationX + ', ' + locationY,
-            'rooms': getRandomInt(1, 3),
-            'guests': getRandomInt(1, 3),
-            'checkin': getRandomElement(REGISTRATION_TIMES),
-            'checkout': getRandomElement(REGISTRATION_TIMES),
-            'features': getRandomArray(FEATURES),
-            'description': getRandomElement(DESCRIPTIONS),
-            'photos': getRandomArray(PHOTOS)
-          },
-          'location': {
-            'x': locationX,
-            'y': locationY
-          }
-        });
-      }
-      return ads;
-    },
-    deleteItems: function (selector) {
-      var elements = document.querySelectorAll(selector);
-      if (elements) {
-        elements.forEach(function (item) {
-          item.remove();
-        });
-      }
-    },
-    enableElements: function (elements) {
-      for (var i = 0; i < elements.length; i++) {
-        elements[i].disabled = false;
-      }
-    },
-    disableElements: function (elements) {
-      for (var i = 0; i < elements.length; i++) {
-        elements[i].disabled = true;
-      }
-    }
+    fillAds: fillAdsData,
+    deleteItems: deleteItems,
+    enableElements: enableElements,
+    disableElements: disableElements
   };
 })();

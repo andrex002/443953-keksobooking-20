@@ -1,9 +1,19 @@
 'use strict';
 
 (function () {
-  var mapPinMain = window.map.map.querySelector('.map__pin--main');
-  var mapPinsElement = window.map.map.querySelector('.map__pins');
-  var mapFiltersElement = window.map.map.querySelector('.map__filters');
+  var TYPE_PRICE = window.data.TYPE_PRICE;
+  var GUEST_ROOM = window.data.GUEST_ROOM;
+  var NUMBER_ADS = window.data.NUMBER_ADS;
+  var fillAdsData = window.data.fillAds;
+  var map = window.map.layout;
+  var renderAd = window.pin.renderAd;
+  var enableElements = window.data.enableElements;
+  var disableElements = window.data.disableElements;
+  var deleteItems = window.data.deleteItems;
+
+  var mapPinMain = map.querySelector('.map__pin--main');
+  var mapPinsElement = map.querySelector('.map__pins');
+  var mapFiltersElement = map.querySelector('.map__filters');
   var adForm = document.querySelector('.ad-form');
   var adFormFieldsets = adForm.querySelectorAll('fieldset');
   var addressInput = adForm.querySelector('#address');
@@ -33,7 +43,7 @@
   //  Устанавливает значение минимальной цены
   var setMinPrice = function () {
     var typeHousing = selectType.value;
-    var minPrice = window.data.TYPE_PRICE[typeHousing]['minPrice'];
+    var minPrice = TYPE_PRICE[typeHousing]['minPrice'];
     inputPrice.min = minPrice;
     inputPrice.placeholder = minPrice;
   };
@@ -47,18 +57,18 @@
   var renderBlockAds = function (ads) {
     var fragment = document.createDocumentFragment();
     ads.forEach(function (item) {
-      fragment.appendChild(window.pin.renderAd(item));
+      fragment.appendChild(renderAd(item));
     });
     mapPinsElement.appendChild(fragment);
   };
 
   //  Активирует страницу
   var activatePage = function () {
-    window.map.map.classList.remove('map--faded');
+    map.classList.remove('map--faded');
     adForm.classList.remove('ad-form--disabled');
     renderBlockAds(ads);
-    window.data.enableElements(adFormFieldsets);
-    window.data.enableElements(mapFiltersElement.children);
+    enableElements(adFormFieldsets);
+    enableElements(mapFiltersElement.children);
     fillAddressInput(true);
     mapPinMain.removeEventListener('mousedown', onMapPinMousedown);
     mapPinMain.removeEventListener('keydown', onMapPinKeydown);
@@ -67,11 +77,11 @@
 
   //  Деактивирует страницу
   var deactivatePage = function () {
-    window.map.map.classList.add('map--faded');
+    map.classList.add('map--faded');
     adForm.classList.add('ad-form--disabled');
-    window.data.deleteItems('.map__pin:not(.map__pin--main)');
-    window.data.disableElements(adFormFieldsets);
-    window.data.disableElements(mapFiltersElement.elements);
+    deleteItems('.map__pin:not(.map__pin--main)');
+    disableElements(adFormFieldsets);
+    disableElements(mapFiltersElement.elements);
     fillAddressInput(false);
     mapPinMain.addEventListener('mousedown', onMapPinMousedown);
     mapPinMain.addEventListener('keydown', onMapPinKeydown);
@@ -102,14 +112,14 @@
   var validateRooms = function () {
     var rooms = roomNumberSelect.value;
     var capacity = capacitySelect.value;
-    if (!window.data.GUEST_ROOM[rooms]['guests'].includes(capacity)) {
-      roomNumberSelect.setCustomValidity(window.data.GUEST_ROOM[rooms]['errorText']);
+    if (!GUEST_ROOM[rooms]['guests'].includes(capacity)) {
+      roomNumberSelect.setCustomValidity(GUEST_ROOM[rooms]['errorText']);
     } else {
       roomNumberSelect.setCustomValidity('');
     }
   };
 
-  var ads = window.data.fillAdsData(window.data.NUMBER_ADS);
+  var ads = fillAdsData(NUMBER_ADS);
   deactivatePage();
   addEventChange(roomNumberSelect);
   addEventChange(capacitySelect);
@@ -121,5 +131,5 @@
     selectType: selectType,
     inputPrice: inputPrice,
     setMinPrice: setMinPrice
-  }
+  };
 })();
