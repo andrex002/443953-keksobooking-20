@@ -70,7 +70,7 @@
     enableElements(adFormFieldsets);
     enableElements(mapFiltersElement.children);
     fillAddressInput(true);
-    mapPinMain.removeEventListener('mousedown', onMapPinMousedown);
+    mapPinMain.removeEventListener('mouseup', onMapPinMouseUp);
     mapPinMain.removeEventListener('keydown', onMapPinKeydown);
     addressInput.setAttribute('readonly', 'readonly');
   };
@@ -83,14 +83,14 @@
     disableElements(adFormFieldsets);
     disableElements(mapFiltersElement.elements);
     fillAddressInput(false);
-    mapPinMain.addEventListener('mousedown', onMapPinMousedown);
+    mapPinMain.addEventListener('mouseup', onMapPinMouseUp);
     mapPinMain.addEventListener('keydown', onMapPinKeydown);
     roomNumberSelect.removeEventListener('change', onSelectChange);
     capacitySelect.removeEventListener('change', onSelectChange);
   };
 
   //  Функция-обработчик клика левой кнопки мыши на элементе
-  var onMapPinMousedown = function (evt) {
+  var onMapPinMouseUp = function (evt) {
     if (evt.button === 0) {
       activatePage();
     }
@@ -127,9 +127,13 @@
   setMinPrice();
 
   window.main = {
+    mapPinMain: mapPinMain,
     adForm: adForm,
     selectType: selectType,
     inputPrice: inputPrice,
-    setMinPrice: setMinPrice
+    setMinPrice: setMinPrice,
+    getPositionPin: getPositionPin,
+    fillAddressInput: fillAddressInput,
+    activatePage: activatePage
   };
 })();
