@@ -3,13 +3,12 @@
 (function () {
   var TYPE_PRICE = window.data.TYPE_PRICE;
   var GUEST_ROOM = window.data.GUEST_ROOM;
-  var NUMBER_ADS = window.data.NUMBER_ADS;
-  var fillAdsData = window.data.fillAds;
   var map = window.map.layout;
   var renderAd = window.pin.renderAd;
   var enableElements = window.data.enableElements;
   var disableElements = window.data.disableElements;
   var deleteItems = window.data.deleteItems;
+  var loadPins = window.backend.loadPins;
 
   var mapPinMain = map.querySelector('.map__pin--main');
   var mapPinsElement = map.querySelector('.map__pins');
@@ -66,13 +65,27 @@
   var activatePage = function () {
     map.classList.remove('map--faded');
     adForm.classList.remove('ad-form--disabled');
-    renderBlockAds(ads);
+    loadPins(renderBlockAds, onErrorLoad);
     enableElements(adFormFieldsets);
     enableElements(mapFiltersElement.children);
     fillAddressInput(true);
     mapPinMain.removeEventListener('mouseup', onMapPinMouseUp);
     mapPinMain.removeEventListener('keydown', onMapPinKeydown);
     addressInput.setAttribute('readonly', 'readonly');
+  };
+
+  //  Выводит текст ошибки на экран
+  var onErrorLoad = function (errorMessage) {
+    var element = document.createElement('div');
+    element.style = 'z-index: 100; text-align: center; padding: 20px; color: white; background: rgba(255, 0, 0, 0.7)';
+    element.style.position = 'fixed';
+    element.style.left = '50%';
+    element.style.top = '50%';
+    element.style.transform = 'translate(-50%, -50%)';
+    element.style.fontSize = '20px';
+    element.textContent = errorMessage;
+
+    document.body.insertAdjacentElement('afterbegin', element);
   };
 
   //  Деактивирует страницу
@@ -119,7 +132,6 @@
     }
   };
 
-  var ads = fillAdsData(NUMBER_ADS);
   deactivatePage();
   addEventChange(roomNumberSelect);
   addEventChange(capacitySelect);
