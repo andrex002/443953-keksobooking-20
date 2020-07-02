@@ -65,7 +65,7 @@
   var activatePage = function () {
     map.classList.remove('map--faded');
     adForm.classList.remove('ad-form--disabled');
-    loadPins(renderBlockAds, onErrorLoad);
+    loadPins(onSuccessLoad, onErrorLoad);
     enableElements(adFormFieldsets);
     enableElements(mapFiltersElement.children);
     fillAddressInput(true);
@@ -86,6 +86,10 @@
     element.textContent = errorMessage;
 
     document.body.insertAdjacentElement('afterbegin', element);
+  };
+
+  var onSuccessLoad = function (response) {
+    renderBlockAds(response);
   };
 
   //  Деактивирует страницу
