@@ -11,6 +11,8 @@
   var loadPins = window.backend.loadPins;
 
   var mapPinMain = map.querySelector('.map__pin--main');
+  var initialPositionPinMainX = mapPinMain.style.left;
+  var initialPositionPinMainY = mapPinMain.style.top;
   var mapPinsElement = map.querySelector('.map__pins');
   var mapFiltersElement = map.querySelector('.map__filters');
   var adForm = document.querySelector('.ad-form');
@@ -20,6 +22,18 @@
   var capacitySelect = adForm.querySelector('#capacity');
   var selectType = adForm.querySelector('#type');
   var inputPrice = adForm.querySelector('#price');
+  var resetBtn = adForm.querySelector('.ad-form__reset');
+  var formFilter = map.querySelector('.map__filters');
+
+  //  Возвращает главную метку в начальное положение
+  var returnsInitialPositionPin = function () {
+    var pinPositionX = mapPinMain.style.left;
+    var pinPositionY = mapPinMain.style.top;
+    if (pinPositionX !== initialPositionPinMainX || pinPositionY !== initialPositionPinMainY) {
+      mapPinMain.style.left = initialPositionPinMainX;
+      mapPinMain.style.top = initialPositionPinMainY;
+    }
+  };
 
   //  Определяет позицию элемента
   var getPositionPin = function (pin, isActive) {
@@ -72,9 +86,10 @@
     mapPinMain.removeEventListener('mouseup', onMapPinMouseUp);
     mapPinMain.removeEventListener('keydown', onMapPinKeydown);
     addressInput.setAttribute('readonly', 'readonly');
+    resetBtn.addEventListener('click', onResetBtnClick);
   };
 
-  //  Выводит текст ошибки на экран
+  //  Выводит произвольный текст ошибки на экран
   var onErrorLoad = function (errorMessage) {
     var element = document.createElement('div');
     element.style = 'z-index: 100; text-align: center; padding: 20px; color: white; background: rgba(255, 0, 0, 0.7)';
@@ -97,9 +112,11 @@
     map.classList.add('map--faded');
     adForm.classList.add('ad-form--disabled');
     deleteItems('.map__pin:not(.map__pin--main)');
+    deleteItems('.map__card');
     disableElements(adFormFieldsets);
     disableElements(mapFiltersElement.elements);
     fillAddressInput(false);
+    returnsInitialPositionPin();
     mapPinMain.addEventListener('mouseup', onMapPinMouseUp);
     mapPinMain.addEventListener('keydown', onMapPinKeydown);
     roomNumberSelect.removeEventListener('change', onSelectChange);
@@ -113,7 +130,7 @@
     }
   };
 
-  //  Функция-обработчик клика клавиши Enter на элементе
+  //  Активация страницы нажатием клавиши Enter
   var onMapPinKeydown = function (evt) {
     if (evt.key === 'Enter') {
       activatePage();
@@ -136,6 +153,15 @@
     }
   };
 
+  //  Сбрасывает страницу в исходное состояние
+  var onResetBtnClick = function (evt) {
+    evt.preventDefault();
+    deactivatePage();
+    formFilter.reset();
+    adForm.reset();
+    resetBtn.removeEventListener('click', onResetBtnClick);
+  };
+
   deactivatePage();
   addEventChange(roomNumberSelect);
   addEventChange(capacitySelect);
@@ -150,6 +176,7 @@
     setMinPrice: setMinPrice,
     getPositionPin: getPositionPin,
     fillAddressInput: fillAddressInput,
-    activatePage: activatePage
+    activatePage: activatePage,
+    deactivatePage: deactivatePage
   };
 })();
