@@ -24,6 +24,9 @@
   var inputPrice = adForm.querySelector('#price');
   var resetBtn = adForm.querySelector('.ad-form__reset');
   var formFilter = map.querySelector('.map__filters');
+  var ads = [];
+  var housingTypeSelect = map.querySelector('#housing-type');
+  var housingType = 'any';
 
   //  Возвращает главную метку в начальное положение
   var returnsInitialPositionPin = function () {
@@ -103,8 +106,10 @@
     document.body.insertAdjacentElement('afterbegin', element);
   };
 
+  //  Показывает метки при успешной загрузке с сервера
   var onSuccessLoad = function (response) {
-    renderBlockAds(response);
+    ads = response;
+    updateAds();
   };
 
   //  Деактивирует страницу
@@ -123,7 +128,7 @@
     capacitySelect.removeEventListener('change', onSelectChange);
   };
 
-  //  Функция-обработчик клика левой кнопки мыши на элементе
+  //  Активация страницы кликом левой кнопки мыши на элементе
   var onMapPinMouseUp = function (evt) {
     if (evt.button === 0) {
       activatePage();
@@ -162,6 +167,33 @@
     resetBtn.removeEventListener('click', onResetBtnClick);
   };
 
+  //  Обновляет список меток объявлений в зависимости от установок фильтра "Тип жилья"
+  var updateAds = function () {
+    var newAds = [];
+    if(housingType === 'any') {
+      newAds = ads;
+    } else {
+      newAds = ads.filter(function(item) {
+        return item.offer.type === housingTypeSelect.value;
+      });
+    }
+    var sameTypeHousing = newAds.filter(function(item, i) {
+      return i < 5;
+    });
+
+    renderBlockAds(sameTypeHousing);
+  };
+
+  //  Обработчик изменения фильтра "Тип жилья"
+  var onFilterTypeHousingChange = function() {
+    deleteItems('.map__pin:not(.map__pin--main)');
+    deleteItems('.map__card');
+    housingType = housingTypeSelect.value;
+    updateAds();
+  }
+
+  housingTypeSelect.addEventListener('change', onFilterTypeHousingChange);
+
   deactivatePage();
   addEventChange(roomNumberSelect);
   addEventChange(capacitySelect);
@@ -177,6 +209,7 @@
     getPositionPin: getPositionPin,
     fillAddressInput: fillAddressInput,
     activatePage: activatePage,
-    deactivatePage: deactivatePage
+    deactivatePage: deactivatePage,
+    renderBlockAds: renderBlockAds
   };
 })();
