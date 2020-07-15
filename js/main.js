@@ -24,9 +24,9 @@
   var inputPrice = adForm.querySelector('#price');
   var resetBtn = adForm.querySelector('.ad-form__reset');
   var formFilter = map.querySelector('.map__filters');
-  var ads = [];
+  var adsAll = [];
   var housingTypeSelect = map.querySelector('#housing-type');
-  var housingType = 'any';
+  var housingType;
 
   //  Возвращает главную метку в начальное положение
   var returnsInitialPositionPin = function () {
@@ -72,7 +72,8 @@
   //  Добавляет DOM-элементы (метки) объявлений в блок mapPinsElement
   var renderBlockAds = function (ads) {
     var fragment = document.createDocumentFragment();
-    ads.forEach(function (item) {
+    var selectedAds = ads.slice(0, 5);
+    selectedAds.forEach(function (item) {
       fragment.appendChild(renderAd(item));
     });
     mapPinsElement.appendChild(fragment);
@@ -108,8 +109,8 @@
 
   //  Показывает метки при успешной загрузке с сервера
   var onSuccessLoad = function (response) {
-    ads = response;
-    updateAds();
+    adsAll = response;
+    renderBlockAds(adsAll);
   };
 
   //  Деактивирует страницу
@@ -167,30 +168,31 @@
     resetBtn.removeEventListener('click', onResetBtnClick);
   };
 
+  //  Фильтрует объявления
+  var filtersAds = function () {
+    var filteredAds = adsAll.filter(function (item) {
+      if (housingType === 'any') {
+        return item;
+      } else {
+        return item.offer.type === housingTypeSelect.value;
+      }
+    });
+    return filteredAds;
+  };
+
   //  Обновляет список меток объявлений в зависимости от установок фильтра "Тип жилья"
   var updateAds = function () {
-    var newAds = [];
-    if(housingType === 'any') {
-      newAds = ads;
-    } else {
-      newAds = ads.filter(function(item) {
-        return item.offer.type === housingTypeSelect.value;
-      });
-    }
-    var sameTypeHousing = newAds.filter(function(item, i) {
-      return i < 5;
-    });
-
-    renderBlockAds(sameTypeHousing);
+    var newAds = filtersAds();
+    renderBlockAds(newAds);
   };
 
   //  Обработчик изменения фильтра "Тип жилья"
-  var onFilterTypeHousingChange = function() {
+  var onFilterTypeHousingChange = function () {
     deleteItems('.map__pin:not(.map__pin--main)');
     deleteItems('.map__card');
     housingType = housingTypeSelect.value;
     updateAds();
-  }
+  };
 
   housingTypeSelect.addEventListener('change', onFilterTypeHousingChange);
 
