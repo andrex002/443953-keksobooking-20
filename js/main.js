@@ -172,10 +172,9 @@
   var filtersAds = function () {
     var filteredAds = adsAll.filter(function (item) {
       if (housingType === 'any') {
-        return item;
-      } else {
-        return item.offer.type === housingTypeSelect.value;
+        return true;
       }
+      return item.offer.type === housingTypeSelect.value;
     });
     return filteredAds;
   };
