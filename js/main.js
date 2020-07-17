@@ -24,6 +24,9 @@
   var inputPrice = adForm.querySelector('#price');
   var resetBtn = adForm.querySelector('.ad-form__reset');
   var formFilter = map.querySelector('.map__filters');
+  var adsAll = [];
+  var housingTypeSelect = map.querySelector('#housing-type');
+  var housingType;
 
   //  Возвращает главную метку в начальное положение
   var returnsInitialPositionPin = function () {
@@ -69,7 +72,8 @@
   //  Добавляет DOM-элементы (метки) объявлений в блок mapPinsElement
   var renderBlockAds = function (ads) {
     var fragment = document.createDocumentFragment();
-    ads.forEach(function (item) {
+    var selectedAds = ads.slice(0, 5);
+    selectedAds.forEach(function (item) {
       fragment.appendChild(renderAd(item));
     });
     mapPinsElement.appendChild(fragment);
@@ -103,8 +107,10 @@
     document.body.insertAdjacentElement('afterbegin', element);
   };
 
+  //  Показывает метки при успешной загрузке с сервера
   var onSuccessLoad = function (response) {
-    renderBlockAds(response);
+    adsAll = response;
+    renderBlockAds(adsAll);
   };
 
   //  Деактивирует страницу
@@ -123,7 +129,7 @@
     capacitySelect.removeEventListener('change', onSelectChange);
   };
 
-  //  Функция-обработчик клика левой кнопки мыши на элементе
+  //  Активация страницы кликом левой кнопки мыши на элементе
   var onMapPinMouseUp = function (evt) {
     if (evt.button === 0) {
       activatePage();
@@ -162,6 +168,33 @@
     resetBtn.removeEventListener('click', onResetBtnClick);
   };
 
+  //  Фильтрует объявления
+  var filtersAds = function () {
+    var filteredAds = adsAll.filter(function (item) {
+      if (housingType === 'any') {
+        return true;
+      }
+      return item.offer.type === housingTypeSelect.value;
+    });
+    return filteredAds;
+  };
+
+  //  Обновляет список меток объявлений в зависимости от установок фильтра "Тип жилья"
+  var updateAds = function () {
+    var newAds = filtersAds();
+    renderBlockAds(newAds);
+  };
+
+  //  Обработчик изменения фильтра "Тип жилья"
+  var onFilterTypeHousingChange = function () {
+    deleteItems('.map__pin:not(.map__pin--main)');
+    deleteItems('.map__card');
+    housingType = housingTypeSelect.value;
+    updateAds();
+  };
+
+  housingTypeSelect.addEventListener('change', onFilterTypeHousingChange);
+
   deactivatePage();
   addEventChange(roomNumberSelect);
   addEventChange(capacitySelect);
@@ -177,6 +210,7 @@
     getPositionPin: getPositionPin,
     fillAddressInput: fillAddressInput,
     activatePage: activatePage,
-    deactivatePage: deactivatePage
+    deactivatePage: deactivatePage,
+    renderBlockAds: renderBlockAds
   };
 })();
