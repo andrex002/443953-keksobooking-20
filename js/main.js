@@ -9,6 +9,7 @@
   var disableElements = window.data.disableElements;
   var deleteItems = window.data.deleteItems;
   var loadPins = window.backend.loadPins;
+  var debounce = window.debounce;
 
   var mapPinMain = map.querySelector('.map__pin--main');
   var initialPositionPinMainX = mapPinMain.style.left;
@@ -26,7 +27,10 @@
   var formFilter = map.querySelector('.map__filters');
   var adsAll = [];
   var housingTypeSelect = map.querySelector('#housing-type');
-  var housingType;
+  var housingPriceSelect = map.querySelector('#housing-price');
+  var housingRoomsSelect = map.querySelector('#housing-rooms');
+  var housingGuestsSelect = map.querySelector('#housing-guests');
+  var housingFeaturesFields = map.querySelectorAll('.map__checkbox');
 
   //  Возвращает главную метку в начальное положение
   var returnsInitialPositionPin = function () {
@@ -86,6 +90,7 @@
     loadPins(onSuccessLoad, onErrorLoad);
     enableElements(adFormFieldsets);
     enableElements(mapFiltersElement.children);
+    enableElements(housingFeaturesFields);
     fillAddressInput(true);
     mapPinMain.removeEventListener('mouseup', onMapPinMouseUp);
     mapPinMain.removeEventListener('keydown', onMapPinKeydown);
@@ -168,32 +173,79 @@
     resetBtn.removeEventListener('click', onResetBtnClick);
   };
 
+  //  Фильтрует по "типу жилья"
+  var filterByType = function (ad) {
+    return housingTypeSelect.value === 'any' || housingTypeSelect.value === ad.offer.type;
+  };
+
+  //  Фильтрует по "цене"
+  var filterByPrice = function (ad) {
+    switch (housingPriceSelect.value) {
+      case 'low':
+        return ad.offer.price < 10000;
+      case 'middle':
+        return ad.offer.price >= 10000 && ad.offer.price < 50000;
+      case 'high':
+        return ad.offer.price >= 50000;
+      default:
+        return true;
+    }
+  };
+
+  //  Фильтрует по "количеству комнат"
+  var filterByRooms = function (ad) {
+    return housingRoomsSelect.value === 'any' || Number(housingRoomsSelect.value) === ad.offer.rooms;
+  };
+
+  //  Фильтрует по "количеству гостей"
+  var filterByGuests = function (ad) {
+    return housingGuestsSelect.value === 'any' || Number(housingGuestsSelect.value) === ad.offer.guests;
+  };
+
+  //  Фильтрует по "удобствам"
+  var filterByFeatures = function (ad) {
+    var featuresCheckedElement = map.querySelectorAll('.map__checkbox:checked');
+    var features = Array.from(featuresCheckedElement).map(function (item) {
+      return item.value;
+    });
+    var adFeatures = ad.offer.features;
+    return features.every(function (item) {
+      return adFeatures.includes(item);
+    });
+  };
+
   //  Фильтрует объявления
   var filtersAds = function () {
-    var filteredAds = adsAll.filter(function (item) {
-      if (housingType === 'any') {
-        return true;
+    var filteredAds = [];
+    for (var i = 0; i < adsAll.length; i++) {
+
+      if (filterByType(adsAll[i])
+        && filterByPrice(adsAll[i])
+        && filterByRooms(adsAll[i])
+        && filterByGuests(adsAll[i])
+        && filterByFeatures(adsAll[i])
+      ) {
+        filteredAds.push(adsAll[i]);
       }
-      return item.offer.type === housingTypeSelect.value;
-    });
+    }
     return filteredAds;
   };
 
-  //  Обновляет список меток объявлений в зависимости от установок фильтра "Тип жилья"
+  //  Обновляет список меток объявлений в зависимости от установок фильтров
   var updateAds = function () {
+    deleteItems('.map__pin:not(.map__pin--main)');
+    deleteItems('.map__card');
+    filtersAds();
     var newAds = filtersAds();
     renderBlockAds(newAds);
   };
 
-  //  Обработчик изменения фильтра "Тип жилья"
-  var onFilterTypeHousingChange = function () {
-    deleteItems('.map__pin:not(.map__pin--main)');
-    deleteItems('.map__card');
-    housingType = housingTypeSelect.value;
-    updateAds();
+  //  Обработчик изменения фильтров
+  var onFiltersChange = function () {
+    debounce(updateAds);
   };
 
-  housingTypeSelect.addEventListener('change', onFilterTypeHousingChange);
+  formFilter.addEventListener('change', onFiltersChange);
 
   deactivatePage();
   addEventChange(roomNumberSelect);
