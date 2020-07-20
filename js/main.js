@@ -96,6 +96,7 @@
     mapPinMain.removeEventListener('keydown', onMapPinKeydown);
     addressInput.setAttribute('readonly', 'readonly');
     resetBtn.addEventListener('click', onResetBtnClick);
+    formFilter.addEventListener('change', onFiltersChange);
   };
 
   //  Выводит произвольный текст ошибки на экран
@@ -132,6 +133,7 @@
     mapPinMain.addEventListener('keydown', onMapPinKeydown);
     roomNumberSelect.removeEventListener('change', onSelectChange);
     capacitySelect.removeEventListener('change', onSelectChange);
+    formFilter.removeEventListener('change', onFiltersChange);
   };
 
   //  Активация страницы кликом левой кнопки мыши на элементе
@@ -159,8 +161,10 @@
     var capacity = capacitySelect.value;
     if (!GUEST_ROOM[rooms]['guests'].includes(capacity)) {
       roomNumberSelect.setCustomValidity(GUEST_ROOM[rooms]['errorText']);
+      roomNumberSelect.style.border = '2px solid red';
     } else {
       roomNumberSelect.setCustomValidity('');
+      roomNumberSelect.style.border = '';
     }
   };
 
@@ -244,8 +248,6 @@
   var onFiltersChange = function () {
     debounce(updateAds);
   };
-
-  formFilter.addEventListener('change', onFiltersChange);
 
   deactivatePage();
   addEventChange(roomNumberSelect);

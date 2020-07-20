@@ -66,6 +66,7 @@
   };
 
   inputTitle.addEventListener('invalid', function () {
+    inputTitle.style.border = '2px solid red';
     if (inputTitle.validity.tooShort) {
       inputTitle.setCustomValidity('Заголовок должнен состоять минимум из 30-и символов');
     } else if (inputTitle.validity.tooLong) {
@@ -74,6 +75,7 @@
       inputTitle.setCustomValidity('Обязательное поле');
     } else {
       inputTitle.setCustomValidity('');
+      inputTitle.style.border = '';
     }
   });
 
@@ -82,6 +84,7 @@
   });
 
   inputPrice.addEventListener('invalid', function () {
+    inputPrice.style.border = '2px solid red';
     if (inputPrice.validity.valueMissing) {
       inputPrice.setCustomValidity('Поле не может быть пустым');
     } else if (inputPrice.validity.rangeUnderflow) {
@@ -90,6 +93,7 @@
       inputPrice.setCustomValidity('Максимальное значение — 1 000 000');
     } else {
       inputPrice.setCustomValidity('');
+      inputPrice.style.border = '';
     }
   });
 

@@ -49,7 +49,7 @@
 
   //  Сохраняет данные формы нового объявления
   var saveFormData = function (onSuccess, onError, data) {
-    var URL = 'https://javascript.pages.academy/keksobookin';
+    var URL = 'https://javascript.pages.academy/keksobooking';
     var processServerResponse = makeRequestToServer(URL, 'POST', data);
     processServerResponse(onSuccess, onError);
   };
