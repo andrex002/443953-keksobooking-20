@@ -4,7 +4,7 @@
   var DEBOUNCE_INTERVAL = 500;
   var lastTimeoutId = null;
 
-  var debounce = function (callback) {
+  window.debounce = function (callback) {
     if (lastTimeoutId) {
       window.clearTimeout(lastTimeoutId);
     }
@@ -13,6 +13,4 @@
       callback();
     }, DEBOUNCE_INTERVAL);
   };
-
-  window.debounce = debounce;
 })();

@@ -8,11 +8,13 @@
   var setMinPrice = window.main.setMinPrice;
   var deactivatePage = window.main.deactivatePage;
   var saveFormData = window.backend.saveFormData;
+  var validateRooms = window.main.validateRooms;
 
   var inputTitle = adForm.querySelector('#title');
   var timeinSelect = adForm.querySelector('#timein');
   var timeoutSelect = adForm.querySelector('#timeout');
   var registrationTimeFieldset = adForm.querySelector('.ad-form__element--time');
+  var adFormSubmitBtn = adForm.querySelector('.ad-form__submit');
 
   //  Обработчик закрытия окна успешного сообщения по клику и нажатию Escape
   var onOverlaySuccessClose = function (evt) {
@@ -104,6 +106,10 @@
     } else {
       timeinSelect.value = time;
     }
+  });
+
+  adFormSubmitBtn.addEventListener('click', function () {
+    validateRooms();
   });
 
   adForm.addEventListener('submit', function (evt) {
